@@ -13,7 +13,7 @@ RUN apt-get update && \
     inetutils-ping=2:1.9.4-3 \
     inetutils-traceroute=2:1.9.4-3 \
     net-tools=1.60+git20161116.90da8a0-1ubuntu1 \
-    iptables=1.6.1-2ubuntu2 \
+    iptables \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -25,8 +25,8 @@ RUN chmod 0400 /etc/sudoers.d/hackersudo
 # Create a Python 2.x environment using conda including at least the ipython kernel
 # and the kernda utility. Add any additional packages you want available for use
 # in a Python 2 notebook to the first line here (e.g., pandas, matplotlib, etc.)
-RUN conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 ipython=5.8.0 ipykernel=4.10.0 kernda=0.3.0 && \
-    conda clean -tipsy
+RUN conda upgrade -n base -c defaults --override-channels conda && \
+    conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 ipython=5.8.0 ipykernel=4.10.0 kernda=0.3.0
 
 # Create a global kernelspec in the image and modify it so that it properly activates
 # the python2 conda environment.
@@ -42,7 +42,7 @@ COPY sslstrip /tmp
 WORKDIR /tmp
 
 # Install SSLStrip and its dependencies
-RUN pip install pyopenssl==19.0.0 service_identity==18.1.0 Twisted==18.9.0 && \
+RUN pip install pyopenssl service_identity Twisted && \
     python setup.py install && \
     rm -rf /tmp/sslstrip && \
     fix-permissions $CONDA_DIR
